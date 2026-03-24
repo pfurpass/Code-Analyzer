@@ -1,0 +1,88 @@
+rules:
+  # ── Python-Specific Quality Rules ─────────────────────────────────────────
+
+  - id: python-bare-except
+    pattern: |
+      try:
+        ...
+      except:
+        ...
+    message: "Bare except clause catches all exceptions including SystemExit/KeyboardInterrupt. Use 'except Exception' or be specific."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: quality
+
+  - id: python-mutable-default-arg
+    patterns:
+      - pattern: |
+          def $FUNC(..., $ARG=[], ...):
+            ...
+      - pattern: |
+          def $FUNC(..., $ARG={}, ...):
+            ...
+    message: "Mutable default argument is shared across all calls. Use None and initialize inside the function."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: quality
+
+  - id: python-print-statement
+    pattern: print(...)
+    message: "print() statement found. Use the logging module for production code."
+    severity: INFO
+    languages: [python]
+    metadata:
+      category: quality
+
+  - id: python-assert-in-production
+    pattern: assert $COND, $MSG
+    message: "assert statements are disabled with -O flag. Use explicit checks for production validation."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: quality
+
+  - id: python-broad-exception-raise
+    patterns:
+      - pattern-either:
+          - pattern: raise Exception($MSG)
+          - pattern: raise BaseException($MSG)
+    message: "Raising a broad Exception type. Create or use a specific exception class."
+    severity: INFO
+    languages: [python]
+    metadata:
+      category: maintainability
+
+  - id: python-wildcard-import
+    pattern: from $MODULE import *
+    message: "Wildcard import pollutes the namespace. Import only what you need."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: maintainability
+
+  - id: python-hardcoded-tmp-path
+    pattern-regex: '["'\'](/tmp/[^"\']+)["\'']'
+    message: "Hardcoded /tmp path. Use tempfile.mkstemp() or tempfile.mkdtemp() for secure temp files."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: security
+
+  - id: python-open-without-encoding
+    pattern: open($FILE, $MODE)
+    pattern-not: open($FILE, $MODE, encoding=...)
+    message: "File opened without explicit encoding. Specify encoding='utf-8' to avoid platform-specific issues."
+    severity: INFO
+    languages: [python]
+    metadata:
+      category: quality
+
+  - id: python-unused-variable-underscore
+    pattern-regex: '^    [a-z][a-z_]+ = .+$'
+    message: "Potentially unused variable. Prefix with _ if intentionally unused."
+    severity: INFO
+    languages: [python]
+    metadata:
+      category: maintainability

@@ -1,0 +1,105 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ca_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: code_analyzer
+      POSTGRES_USER: ca_user
+      POSTGRES_PASSWORD: ca_secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./api/src/db/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ca_user -d code_analyzer"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: ca_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: ca_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://ca_user:ca_secret@postgres:5432/code_analyzer
+      REDIS_URL: redis://redis:6379
+      UPLOAD_DIR: /tmp/ca_uploads
+      MAX_UPLOAD_SIZE_MB: 200
+    volumes:
+      - scan_uploads:/tmp/ca_uploads
+      - scan_results:/tmp/ca_results
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: ca_worker
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://ca_user:ca_secret@postgres:5432/code_analyzer
+      REDIS_URL: redis://redis:6379
+      UPLOAD_DIR: /tmp/ca_uploads
+      RESULTS_DIR: /tmp/ca_results
+      WORKER_CONCURRENCY: 3
+    volumes:
+      - scan_uploads:/tmp/ca_uploads
+      - scan_results:/tmp/ca_results
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: ca_ui
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres_data:
+  redis_data:
+  scan_uploads:
+  scan_results:

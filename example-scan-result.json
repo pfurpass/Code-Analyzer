@@ -1,0 +1,200 @@
+{
+  "scanId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "status": "done",
+  "sourceType": "git",
+  "sourceUrl": "https://github.com/example/myapp",
+  "branch": "main",
+  "timestamps": {
+    "created": "2024-04-01T10:00:00.000Z",
+    "started": "2024-04-01T10:00:02.000Z",
+    "completed": "2024-04-01T10:01:15.000Z"
+  },
+  "results": {
+    "scores": {
+      "quality": 72,
+      "security": 55,
+      "maintainability": 80
+    },
+    "stats": {
+      "total": 24,
+      "by_severity": {
+        "high": 4,
+        "medium": 8,
+        "low": 12
+      },
+      "by_type": {
+        "security": 6,
+        "quality": 11,
+        "maintainability": 7
+      },
+      "by_source": {
+        "eslint": 10,
+        "pylint": 6,
+        "semgrep": 8
+      },
+      "top_files": [
+        { "file": "src/api/routes/users.js", "count": 6 },
+        { "file": "scripts/migrate.py",      "count": 4 },
+        { "file": "src/utils/db.js",          "count": 3 },
+        { "file": "app/models/user.py",       "count": 2 }
+      ]
+    },
+    "fileCount": 42,
+    "languageBreakdown": {
+      "javascript_typescript": 28,
+      "python": 14
+    },
+    "issues": [
+      {
+        "file": "src/api/routes/users.js",
+        "line": 34,
+        "column": 5,
+        "severity": "high",
+        "type": "security",
+        "message": "Potential SQL injection via string concatenation. Use parameterized queries.",
+        "rule": "sql-injection-string-concat",
+        "source": "semgrep",
+        "cwe": ["CWE-89"],
+        "owasp": ["A03:2021"]
+      },
+      {
+        "file": "src/config/app.js",
+        "line": 12,
+        "column": 18,
+        "severity": "high",
+        "type": "security",
+        "message": "Hardcoded credential detected in variable 'apiKey'. Use environment variables instead.",
+        "rule": "hardcoded-password",
+        "source": "semgrep",
+        "cwe": ["CWE-798"],
+        "owasp": ["A07:2021"]
+      },
+      {
+        "file": "src/utils/crypto.js",
+        "line": 8,
+        "column": 14,
+        "severity": "high",
+        "type": "security",
+        "message": "MD5 is cryptographically weak. Use SHA-256 or stronger.",
+        "rule": "weak-crypto-md5",
+        "source": "semgrep",
+        "cwe": ["CWE-327"],
+        "owasp": []
+      },
+      {
+        "file": "scripts/migrate.py",
+        "line": 55,
+        "column": 1,
+        "severity": "high",
+        "type": "security",
+        "message": "SSL verification is disabled. This exposes the application to MITM attacks.",
+        "rule": "python-disable-ssl-verify",
+        "source": "semgrep",
+        "cwe": ["CWE-295"],
+        "owasp": []
+      },
+      {
+        "file": "src/api/routes/users.js",
+        "line": 22,
+        "column": 3,
+        "severity": "medium",
+        "type": "quality",
+        "message": "Empty catch block swallows errors silently. Add error handling or logging.",
+        "rule": "empty-catch-block",
+        "source": "semgrep",
+        "cwe": [],
+        "owasp": []
+      },
+      {
+        "file": "src/api/routes/users.js",
+        "line": 17,
+        "column": 3,
+        "severity": "medium",
+        "type": "quality",
+        "message": "console.log() should not be used in production code. Use a proper logger.",
+        "rule": "no-console-log-production",
+        "source": "semgrep",
+        "cwe": [],
+        "owasp": []
+      },
+      {
+        "file": "src/utils/db.js",
+        "line": 45,
+        "column": 5,
+        "severity": "medium",
+        "type": "quality",
+        "message": "Synchronous fs operations block the event loop. Use async alternatives.",
+        "rule": "synchronous-fs-in-async-context",
+        "source": "semgrep",
+        "cwe": [],
+        "owasp": []
+      },
+      {
+        "file": "app/models/user.py",
+        "line": 28,
+        "column": 1,
+        "severity": "medium",
+        "type": "quality",
+        "message": "[W0703] Catching too general exception Exception",
+        "rule": "W0703",
+        "source": "pylint",
+        "cwe": [],
+        "owasp": []
+      },
+      {
+        "file": "src/api/routes/products.js",
+        "line": 89,
+        "column": 1,
+        "severity": "medium",
+        "type": "quality",
+        "message": "'userId' is defined but never used.",
+        "rule": "no-unused-vars",
+        "source": "eslint",
+        "cwe": [],
+        "owasp": []
+      },
+      {
+        "file": "src/helpers/format.js",
+        "line": 14,
+        "column": 1,
+        "severity": "medium",
+        "type": "maintainability",
+        "message": "Hardcoded URL detected. Move to environment variables or configuration files.",
+        "rule": "no-hardcoded-urls",
+        "source": "semgrep",
+        "cwe": [],
+        "owasp": []
+      },
+      {
+        "file": "scripts/migrate.py",
+        "line": 10,
+        "column": 1,
+        "severity": "low",
+        "type": "maintainability",
+        "message": "[C0114] Missing module docstring",
+        "rule": "C0114",
+        "source": "pylint",
+        "cwe": [],
+        "owasp": []
+      },
+      {
+        "file": "src/api/routes/users.js",
+        "line": 5,
+        "column": 1,
+        "severity": "low",
+        "type": "quality",
+        "message": "Prefer 'const' over 'let' when variable is not reassigned.",
+        "rule": "prefer-const",
+        "source": "eslint",
+        "cwe": [],
+        "owasp": []
+      }
+    ],
+    "pagination": {
+      "total": 24,
+      "page": 1,
+      "limit": 50,
+      "pages": 1
+    }
+  }
+}

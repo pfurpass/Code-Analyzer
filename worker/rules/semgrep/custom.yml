@@ -1,0 +1,61 @@
+rules:
+  # ── Custom Organization Rules ─────────────────────────────────────────────
+  # These are project-specific rules you can customize for your codebase.
+
+  - id: no-direct-db-in-routes
+    patterns:
+      - pattern-either:
+          - pattern: req.$METHOD(..., async ($REQ, $RES) => { ... db.query(...) ... })
+          - pattern: router.$METHOD(..., async ($REQ, $RES) => { ... pool.query(...) ... })
+    message: "Direct database queries in route handlers detected. Move to a service/repository layer."
+    severity: INFO
+    languages: [javascript, typescript]
+    metadata:
+      category: maintainability
+
+  # NOTE: magic-numbers rule removed.
+  # Regex-based number detection causes massive false positives on lookup tables,
+  # syscall definitions, config files, and any numeric constants file.
+  # For JS/TS projects, use ESLint's built-in no-magic-numbers rule with
+  # a proper allowlist instead — it understands AST context, not just patterns.
+
+  - id: no-sync-in-promise
+    patterns:
+      - pattern-either:
+          - pattern: |
+              new Promise(($RESOLVE, $REJECT) => {
+                ...
+                $X.readFileSync(...)
+                ...
+              })
+          - pattern: |
+              new Promise(($RESOLVE, $REJECT) => {
+                ...
+                $X.writeFileSync(...)
+                ...
+              })
+    message: "Synchronous operation inside Promise constructor blocks the event loop."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      category: quality
+
+  - id: error-handling-required-in-async
+    patterns:
+      - pattern: |
+          async function $FUNC(...) {
+            $BODY
+          }
+      - pattern-not: |
+          async function $FUNC(...) {
+            try {
+              ...
+            } catch (...) {
+              ...
+            }
+          }
+    message: "Async function without try/catch. Unhandled promise rejections can crash the process."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      category: quality

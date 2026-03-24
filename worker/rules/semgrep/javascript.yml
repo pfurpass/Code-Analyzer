@@ -1,0 +1,101 @@
+rules:
+  # ── Production Code Quality ──────────────────────────────────────────────
+
+  - id: no-console-log-production
+    pattern: console.log(...)
+    message: "console.log() should not be used in production code. Use a proper logger."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      category: quality
+
+  - id: no-console-error-unhandled
+    pattern: console.error(...)
+    message: "console.error() detected. Consider using a structured logging library."
+    severity: INFO
+    languages: [javascript, typescript]
+    metadata:
+      category: quality
+
+  - id: no-hardcoded-urls
+    pattern-regex: '(https?://(?!localhost|127\.0\.0\.1|example\.com)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[^\s"''`]*)'
+    message: "Hardcoded URL detected. Move to environment variables or configuration files."
+    severity: WARNING
+    languages: [javascript, typescript, python]
+    metadata:
+      category: maintainability
+
+  - id: empty-catch-block
+    patterns:
+      - pattern: |
+          try {
+            ...
+          } catch ($E) {
+          }
+    message: "Empty catch block swallows errors silently. Add error handling or logging."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      category: quality
+
+  - id: catch-without-handling
+    patterns:
+      - pattern: |
+          try {
+            ...
+          } catch ($E) {
+            console.log(...)
+          }
+    message: "Catch block only logs the error. Add proper error handling or re-throw."
+    severity: INFO
+    languages: [javascript, typescript]
+    metadata:
+      category: maintainability
+
+  - id: todo-fixme-in-code
+    pattern-regex: '(TODO|FIXME|HACK|XXX|BUG):'
+    message: "TODO/FIXME comment detected. Track this in your issue tracker."
+    severity: INFO
+    languages: [javascript, typescript, python]
+    metadata:
+      category: maintainability
+
+  - id: no-debugger-statement
+    pattern: debugger
+    message: "debugger statement found. Remove before deploying to production."
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      category: quality
+
+  - id: no-alert-statement
+    patterns:
+      - pattern-either:
+          - pattern: alert($MSG)
+          - pattern: confirm($MSG)
+          - pattern: prompt($MSG)
+    message: "Browser dialog functions (alert/confirm/prompt) should not be used in production."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      category: quality
+
+  - id: synchronous-fs-in-async-context
+    patterns:
+      - pattern-either:
+          - pattern: fs.readFileSync(...)
+          - pattern: fs.writeFileSync(...)
+          - pattern: fs.existsSync(...)
+    message: "Synchronous fs operations block the event loop. Use async alternatives."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      category: quality
+
+  - id: no-process-exit-in-library
+    pattern: process.exit($CODE)
+    message: "process.exit() is dangerous in library code. Throw an error instead."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      category: quality
