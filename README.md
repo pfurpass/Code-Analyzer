@@ -10,6 +10,19 @@ Static code analysis platform for JavaScript/TypeScript and Python.
 
 ---
 
+## Screenshots
+
+### Dashboard
+![Dashboard](github_img/dashboard.png)
+
+### Scan Results
+![Results](github_img/results.png)
+
+### New Scan
+![New Scan](github_img/new-scan.png)
+
+---
+
 ## What does it do?
 
 Code Analyzer accepts a Git repository URL or a ZIP file and returns:
@@ -37,6 +50,40 @@ open http://localhost:8080
 ```
 
 No setup, no API keys, no cloud required.
+
+---
+
+## Try It — Demo Repository
+
+To see results immediately, scan this pre-built vulnerable demo app:
+
+**Git URL (recommended):**
+```
+https://github.com/pfurpass/demo-vulnerable-app
+```
+
+Or download the ZIP and use the upload mode.
+
+**What it contains (intentional issues for demo purposes):**
+
+| Severity | Issue | File |
+|----------|-------|------|
+| HIGH | SQL Injection (×6) | `src/routes/users.js`, `src/models/user.js` |
+| HIGH | Command Injection | `src/routes/admin.js`, `scripts/report_generator.py` |
+| HIGH | Hardcoded secrets (JWT, AWS, Stripe) | `config/config.js`, `scripts/data_sync.py` |
+| HIGH | `eval()` / `new Function()` | `src/routes/users.js`, `src/utils/crypto.js` |
+| HIGH | Unsafe `pickle.loads()` | `scripts/data_sync.py` |
+| HIGH | SSL verify disabled | `scripts/data_sync.py` |
+| MEDIUM | MD5 / SHA1 password hashing | `src/utils/crypto.js` |
+| MEDIUM | CORS wildcard | `app.js` |
+| MEDIUM | `console.log()` in production | multiple files |
+| MEDIUM | Bare except (Python) | `scripts/data_sync.py` |
+| LOW | Hardcoded URLs | `config/config.js` |
+| LOW | `debugger` statement | `src/routes/admin.js` |
+
+Expected scores: **Quality ~55 · Security ~30 · Maintainability ~75**
+
+> ⚠️ This repository exists purely for testing. Never deploy it.
 
 ---
 
@@ -205,6 +252,7 @@ code-analyzer/
 ├── docker-compose.yml          # Full stack orchestration
 ├── Makefile                    # Dev shortcuts
 ├── .env.example                # Environment template
+├── github_img/                 # README screenshots
 │
 ├── api/                        # Node.js API server
 │   └── src/
@@ -261,7 +309,7 @@ docker-compose up -d
 # Test the API directly
 curl -X POST http://localhost:3000/scan/git \
   -H "Content-Type: application/json" \
-  -d '{"repoUrl":"https://github.com/expressjs/express","branch":"master"}'
+  -d '{"repoUrl":"https://github.com/pfurpass/demo-vulnerable-app","branch":"main"}'
 
 # Database shell
 docker exec -it ca_postgres psql -U ca_user -d code_analyzer
@@ -340,37 +388,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
-
----
-
-## Try It — Demo Repository
-
-To see results immediately, scan this pre-built vulnerable demo app:
-
-**Git URL (recommended):**
-```
-https://github.com/pfurpass/demo-vulnerable-app
-```
-
-Or download the ZIP and use the upload mode.
-
-**What it contains (intentional issues for demo purposes):**
-
-| Severity | Issue | File |
-|----------|-------|------|
-| HIGH | SQL Injection (×6) | `src/routes/users.js`, `src/models/user.js` |
-| HIGH | Command Injection | `src/routes/admin.js`, `scripts/report_generator.py` |
-| HIGH | Hardcoded secrets (JWT, AWS, Stripe) | `config/config.js`, `scripts/data_sync.py` |
-| HIGH | `eval()` / `new Function()` | `src/routes/users.js`, `src/utils/crypto.js` |
-| HIGH | Unsafe `pickle.loads()` | `scripts/data_sync.py` |
-| HIGH | SSL verify disabled | `scripts/data_sync.py` |
-| MEDIUM | MD5 / SHA1 password hashing | `src/utils/crypto.js` |
-| MEDIUM | CORS wildcard | `app.js` |
-| MEDIUM | `console.log()` in production | multiple files |
-| MEDIUM | Bare except (Python) | `scripts/data_sync.py` |
-| LOW | Hardcoded URLs | `config/config.js` |
-| LOW | `debugger` statement | `src/routes/admin.js` |
-
-Expected scores: **Quality ~55 · Security ~30 · Maintainability ~75**
-
-> ⚠️ This repository exists purely for testing. Never deploy it.
